@@ -33,14 +33,27 @@ interface Balance {
 
 const Dashboard: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  // const [balance, setBalance] = useState<Balance>({} as Balance);
+  const [balance, setBalance] = useState<Balance>({} as Balance);
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
       const { data } = await api.get('transactions');
-      const transaction = data.transactions;
 
-      setTransactions(transaction);
+      // Mapeio o array de transactions e retorno com novos parametros
+      const transctionsFormatted = data.transactions.map((t: Transaction) => ({
+        ...t,
+        formattedValue: formatValue(t.value),
+        formattedDate: new Date(t.created_at).toLocaleDateString('pt-br'),
+      }));
+
+      const balanceFormatted = {
+        income: formatValue(data.balance.income),
+        outcome: formatValue(data.balance.outcome),
+        total: formatValue(data.balance.total),
+      };
+
+      setTransactions(transctionsFormatted);
+      setBalance(balanceFormatted);
     }
 
     loadTransactions();
@@ -56,21 +69,21 @@ const Dashboard: React.FC = () => {
               <p>Entradas</p>
               <img src={income} alt="Income" />
             </header>
-            <h1 data-testid="balance-income">R$ 5.000,00</h1>
+            <h1 data-testid="balance-income">{balance.income}</h1>
           </Card>
           <Card>
             <header>
               <p>Saídas</p>
               <img src={outcome} alt="Outcome" />
             </header>
-            <h1 data-testid="balance-outcome">R$ 1.000,00</h1>
+            <h1 data-testid="balance-outcome">{balance.outcome}</h1>
           </Card>
           <Card total>
             <header>
               <p>Total</p>
               <img src={total} alt="Total" />
             </header>
-            <h1 data-testid="balance-total">R$ 4000,00</h1>
+            <h1 data-testid="balance-total">{balance.total}</h1>
           </Card>
         </CardContainer>
 
@@ -94,10 +107,12 @@ const Dashboard: React.FC = () => {
                       transaction.type === 'outcome' ? 'outcome' : 'income'
                     }
                   >
-                    {formatValue(transaction.value)}
+                    {transaction.type === 'outcome'
+                      ? `- ${transaction.formattedValue}`
+                      : `${transaction.formattedValue}`}
                   </td>
                   <td>{transaction.category.title}</td>
-                  <td>{transaction.created_at}</td>
+                  <td>{transaction.formattedDate}</td>
                 </tr>
               ))}
             </tbody>
