@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 
 import filesize from 'filesize';
 
-import fileSize from 'filesize';
 import Header from '../../components/Header';
 import FileList from '../../components/FileList';
 import Upload from '../../components/Upload';
@@ -45,7 +44,7 @@ const Import: React.FC = () => {
     const uploadFiles = files.map(file => ({
       file,
       name: file.name,
-      readableSize: fileSize(file.size),
+      readableSize: filesize(file.size),
     }));
 
     setUploadedFiles(uploadFiles);
