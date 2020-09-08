@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import React, { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 
 import income from '../../assets/income.svg';
 import outcome from '../../assets/outcome.svg';
@@ -42,7 +44,7 @@ const Dashboard: React.FC = () => {
     }
 
     loadTransactions();
-  }, [transactions]);
+  }, []);
 
   return (
     <>
@@ -87,9 +89,15 @@ const Dashboard: React.FC = () => {
               {transactions.map(transaction => (
                 <tr key={transaction.id}>
                   <td className="title">{transaction.title}</td>
-                  <td className="income">{transaction.value}</td>
+                  <td
+                    className={
+                      transaction.type === 'outcome' ? 'outcome' : 'income'
+                    }
+                  >
+                    {formatValue(transaction.value)}
+                  </td>
                   <td>{transaction.category.title}</td>
-                  <td>{transaction.formattedDate}</td>
+                  <td>{transaction.created_at}</td>
                 </tr>
               ))}
             </tbody>
